@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B Multivendor Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3B82F6;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        input, select {
+            @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white border;
+        }
+        .bg-primary {
+            background-color: #3B82F6;
+        }
+        .text-primary {
+            color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- App Container -->
+    <div id="app" class="min-h-screen">
+        <!-- Authentication Section -->
+        <div id="authSection" class="min-h-screen flex items-center justify-center p-4">
+            <!-- Login Form -->
+            <div id="loginForm" class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+                <h1 class="text-2xl font-bold text-center mb-6">B2B Marketplace Login</h1>
+                <form class="space-y-4">
+                    <div class="flex justify-center mb-4 space-x-4">
+                        <button type="button" id="emailLoginBtn" class="py-2 px-4 font-medium border-b-2 border-blue-500 text-blue-600">Email Login</button>
+                        <button type="button" id="phoneLoginBtn" class="py-2 px-4 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Phone Login</button>
+                    </div>
+                    
+                    <div id="emailLoginFields">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="loginEmail" required placeholder="Enter your email">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        </div>
+                    </div>
+
+                    <div id="phoneLoginFields" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="loginPhone" required placeholder="Enter your phone number">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="loginPasswordPhone" required placeholder="Enter your password">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" class="h-4 w-4 text-blue-600">
+                            <label for="rememberMe" class="ml-2 text-sm text-gray-600">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                        Login
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <p class="text-gray-600">Don't have an account? 
+                            <a href="#" id="showRegisterBtn" class="text-blue-600 hover:text-blue-800 font-medium">Register now</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registerForm" class="hidden bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+                <h1 class="text-2xl font-bold text-center mb-6">Business Registration</h1>
+                <form class="space-y-4">
+                    <!-- Step 1: Basic Information -->
+                    <div id="registerStep1" class="space-y-4">
+                        <h3 class="font-medium text-lg">Basic Information</h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                            <input type="text" id="businessName" required placeholder="Enter your business name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="registerEmail" required placeholder="Enter your business email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="registerPhone" required placeholder="Enter your phone number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="registerPassword" required placeholder="Create a strong password">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                            <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                        </div>
+                        <button type="button" id="nextToStep2" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                            Continue
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Business Profile -->
+                    <div id="registerStep2" class="hidden space-y-4">
+                        <h3 class="font-medium text-lg">Business Profile</h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Business Type</label>
+                            <select id="businessType" required>
+                                <option value="">Select business type</option>
+                                <option value="manufacturer">Manufacturer</option>
+                                <option value="wholesaler">Wholesaler</option>
+                                <option value="retailer">Retailer</option>
+                                <option value="distributor">Distributor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                            <select id="industry" required>
+                                <option value="">Select your industry</option>
+                                <option value="furniture">Furniture Hardware</option>
+                                <option value="autoparts">Auto Parts</option>
+                                <option value="building">Building Materials</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
+                            <input type="text" id="businessAddress" required placeholder="Enter your business address">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                            <input type="text" id="businessCity" required placeholder="Enter city">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+                            <input type="text" id="businessState" required placeholder="Enter state/province">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                            <input type="text" id="businessCountry" required placeholder="Enter country">
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="button" id="backToStep1" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
+                                Back
+                            </button>
+                            <button type="submit" id="registerSubmitBtn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                Register
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="text-gray-600">Already have an account? 
+                            <a href="#" id="showLoginBtn" class="text-blue-600 hover:text-blue-800 font-medium">Login</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App Section -->
+        <div id="mainSection" class="hidden">
+            <!-- Navigation -->
+            <nav class="bg-white shadow-lg">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex justify-between h-16">
+                        <div class="flex items-center">
+                            <span class="text-xl font-bold">B2B Marketplace</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button id="cartBtn" class="relative">
+                                <i class="bi bi-cart text-2xl"></i>
+                                <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                            </button>
+                            <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">
+                                <i class="bi bi-box-arrow-right text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <!-- Home Page Categories -->
+                <div id="categoriesSection">
+                    <h2 class="text-2xl font-semibold mb-6">Main Categories</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow category-card" data-category="furniture">
+                            <div class="flex items-center mb-4">
+                                <i class="bi bi-chair text-3xl text-blue-500 mr-4"></i>
+                                <h3 class="text-xl font-medium">Furniture Hardware</h3>
+                            </div>
+                            <p class="text-gray-600">Fittings, handles, knobs, and hardware for furniture manufacturing and repair</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow category-card" data-category="autoparts">
+                            <div class="flex items-center mb-4">
+                                <i class="bi bi-car-front text-3xl text-blue-500 mr-4"></i>
+                                <h3 class="text-xl font-medium">Auto Parts</h3>
+                            </div>
+                            <p class="text-gray-600">Engine components, brake systems, body parts, electrical systems, and more</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow category-card" data-category="building">
+                            <div class="flex items-center mb-4">
+                                <i class="bi bi-house-door text-3xl text-blue-500 mr-4"></i>
+                                <h3 class="text-xl font-medium">Building Materials</h3>
+                            </div>
+                            <p class="text-gray-600">Construction materials, structural elements, finishing materials, and more</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-Categories Section -->
+                <div id="subCategoriesSection" class="hidden mt-8">
+                    <div class="flex items-center mb-6">
+                        <button id="backToCategories" class="p-2 mr-2 text-blue-500 hover:text-blue-700">
+                            <i class="bi bi-arrow-left text-xl"></i>
+                        </button>
+                        <h2 class="text-2xl font-semibold" id="subCategoryTitle">Subcategories</h2>
+                    </div>
+                    <div id="subCategoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="productsSection" class="hidden mt-8">
+                    <div class="flex items-center mb-6">
+                        <button id="backToSubCategories" class="p-2 mr-2 text-blue-500 hover:text-blue-700">
+                            <i class="bi bi-arrow-left text-xl"></i>
+                        </button>
+                        <h2 class="text-2xl font-semibold" id="productsTitle">Products</h2>
+                    </div>
+                    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Cart Modal -->
+            <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                <div class="fixed inset-y-0 right-0 max-w-xl w-full bg-white shadow-xl">
+                    <div class="h-full flex flex-col">
+                        <div class="p-4 border-b">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl font-bold">Shopping Cart</h2>
+                                <button id="closeCart" class="text-gray-500 hover:text-gray-700">
+                                    <i class="bi bi-x text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+                        <div class="border-t p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-bold">Total:</span>
+                                <span id="cartTotal" class="font-bold">$0.00</span>
+                            </div>
+                            <button id="checkoutBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                Proceed to Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout Modal -->
+            <div id="checkoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                <div class="fixed inset-y-0 right-0 max-w-xl w-full bg-white shadow-xl">
+                    <div class="h-full flex flex-col">
+                        <div class="p-4 border-b">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl font-bold">Checkout</h2>
+                                <button id="closeCheckout" class="text-gray-500 hover:text-gray-700">
+                                    <i class="bi bi-x text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4">
+                            <form id="checkoutForm" class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-3">Shipping Information</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                                            <input type="text" required placeholder="Enter full name">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                            <input type="tel" required placeholder="Enter phone number">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                            <input type="text" required placeholder="Enter delivery address">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                                <input type="text" required placeholder="City">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code</label>
+                                                <input type="text" required placeholder="ZIP code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-3">Payment Method</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center p-3 border rounded-md">
+                                            <input type="radio" id="paymentCredit" name="paymentMethod" value="credit" class="h-4 w-4 text-blue-600">
+                                            <label for="paymentCredit" class="ml-2">Credit Card</label>
+                                        </div>
+                                        <div class="flex items-center p-3 border rounded-md">
+                                            <input type="radio" id="paymentBank" name="paymentMethod" value="bank" class="h-4 w-4 text-blue-600">
+                                            <label for="paymentBank" class="ml-2">Bank Transfer</label>
+                                        </div>
+                                        <div class="flex items-center p-3 border rounded-md">
+                                            <input type="radio" id="paymentPaypal" name="paymentMethod" value="paypal" class="h-4 w-4 text-blue-600">
+                                            <label for="paymentPaypal" class="ml-2">PayPal</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-3">Order Summary</h3>
+                                    <div class="bg-gray-50 p-3 rounded-md">
+                                        <div id="checkoutItems" class="space-y-3 mb-3"></div>
+                                        <div class="border-t pt-3">
+                                            <div class="flex justify-between">
+                                                <span>Subtotal</span>
+                                                <span id="checkoutSubtotal">$0.00</span>
+                                            </div>
+                                            <div class="flex justify-between mt-1">
+                                                <span>Shipping</span>
+                                                <span>$10.00</span>
+                                            </div>
+                                            <div class="flex justify-between mt-2 font-semibold">
+                                                <span>Total</span>
+                                                <span id="checkoutTotal">$0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="placeOrderBtn" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                    Place Order
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Tracking Modal -->
+            <div id="trackingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                <div class="fixed inset-y-0 right-0 max-w-xl w-full bg-white shadow-xl">
+                    <div class="h-full flex flex-col">
+                        <div class="p-4 border-b">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl font-bold">Order Tracking</h2>
+                                <button id="closeTracking" class="text-gray-500 hover:text-gray-700">
+                                    <i class="bi bi-x text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="trackingInfo" class="flex-1 overflow-y-auto p-4">
+                            <div class="mb-4">
+                                <h3 class="text-lg font-semibold">Order #ORD12345678</h3>
+                                <p class="text-gray-600">Placed on June 10, 2023</p>
+                            </div>
+                            <div class="space-y-8 mt-8">
+                                <div class="relative flex">
+                                    <div class="flex flex-col items-center mr-4">
+                                        <div class="flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full">
+                                            <i class="bi bi-check-lg text-white"></i>
+                                        </div>
+                                        <div class="w-1 h-full bg-blue-500 absolute top-8 left-3.5"></div>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Order Confirmed</p>
+                                        <p class="text-sm text-gray-500">Your order has been placed</p>
+                                        <p class="text-sm text-gray-500 mt-1">June 10, 2023 - 10:30 AM</p>
+                                    </div>
+                                </div>
+                                <div class="relative flex">
+                                    <div class="flex flex-col items-center mr-4">
+                                        <div class="flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full">
+                                            <i class="bi bi-box-seam text-white"></i>
+                                        </div>
+                                        <div class="w-1 h-full bg-blue-500 absolute top-8 left-3.5"></div>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Processing</p>
+                                        <p class="text-sm text-gray-500">Your order is being processed</p>
+                                        <p class="text-sm text-gray-500 mt-1">June 11, 2023 - 2:45 PM</p>
+                                    </div>
+                                </div>
+                                <div class="relative flex">
+                                    <div class="flex flex-col items-center mr-4">
+                                        <div class="flex items-center justify-center w-8 h-8 bg-gray-300 rounded-full">
+                                            <i class="bi bi-truck text-white"></i>
+                                        </div>
+                                        <div class="w-1 h-full bg-gray-300 absolute top-8 left-3.5"></div>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Shipping</p>
+                                        <p class="text-sm text-gray-500">Your order is on the way</p>
+                                        <p class="text-sm text-gray-500 mt-1">Estimated: June 15, 2023</p>
+                                    </div>
+                                </div>
+                                <div class="flex">
+                                    <div class="flex items-center mr-4">
+                                        <div class="flex items-center justify-center w-8 h-8 bg-gray-300 rounded-full">
+                                            <i class="bi bi-house-door text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Delivered</p>
+                                        <p class="text-sm text-gray-500">Package delivered</p>
+                                        <p class="text-sm text-gray-500 mt-1">Estimated: June 18, 2023</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 p-4 border rounded-md bg-gray-50">
+                                <h4 class="font-semibold mb-2">Shipping Details</h4>
+                                <p>John Doe</p>
+                                <p>123 Business Street, Suite 456</p>
+                                <p>New York, NY 10001</p>
+                                <p>United States</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const categories = {
+            furniture: {
+                name: "Furniture Hardware",
+                subcategories: [
+                    { id: "handles", name: "Handles & Knobs", image: "https://source.unsplash.com/400x300/?handle" },
+                    { id: "hinges", name: "Hinges & Brackets", image: "https://source.unsplash.com/400x300/?hinge" },
+                    { id: "drawer", name: "Drawer Systems", image: "https://source.unsplash.com/400x300/?drawer" },
+                    { id: "accessories", name: "Furniture Accessories", image: "https://source.unsplash.com/400x300/?furniture" }
+                ]
+            },
+            autoparts: {
+                name: "Auto Parts",
+                subcategories: [
+                    { id: "engine", name: "Engine Components", image: "https://source.unsplash.com/400x300/?engine" },
+                    { id: "brake", name: "Brake Systems", image: "https://source.unsplash.com/400x300/?brake" },
+                    { id: "electrical", name: "Electrical Systems", image: "https://source.unsplash.com/400x300/?car-electrical" },
+                    { id: "bodyparts", name: "Body Parts", image: "https://source.unsplash.com/400x300/?car-body" }
+                ]
+            },
+            building: {
+                name: "Building Materials",
+                subcategories: [
+                    { id: "lumber", name: "Lumber & Timber", image: "https://source.unsplash.com/400x300/?wood" },
+                    { id: "concrete", name: "Concrete Products", image: "https://source.unsplash.com/400x300/?concrete" },
+                    { id: "roofing", name: "Roofing Materials", image: "https://source.unsplash.com/400x300/?roofing" },
+                    { id: "plumbing", name: "Plumbing & Fixtures", image: "https://source.unsplash.com/400x300/?plumbing" }
+                ]
+            }
+        };
+
+        const products = {
+            handles: [
+                { id: 101, name: "Premium Cabinet Handles", price: 12.99, image: "https://source.unsplash.com/400x300/?cabinet-handle" },
+                { id: 102, name: "Stainless Steel Door Knobs", price: 15.99, image: "https://source.unsplash.com/400x300/?doorknob" },
+                { id: 103, name: "Vintage Drawer Pulls", price: 9.99, image: "https://source.unsplash.com/400x300/?drawer-pull" },
+                { id: 104, name: "Modern Kitchen Handles", price: 11.99, image: "https://source.unsplash.com/400x300/?kitchen-handle" }
+            ],
+            hinges: [
+                { id: 201, name: "Heavy Duty Cabinet Hinges", price: 7.99, image: "https://source.unsplash.com/400x300/?cabinet-hinge" },
+                { id: 202, name: "Hidden Furniture Hinges", price: 8.99, image: "https://source.unsplash.com/400x300/?furniture-hinge" },
+                { id: 203, name: "Soft Close Door Hinges", price: 14.99, image: "https://source.unsplash.com/400x300/?door-hinge" },
+                { id: 204, name: "Decorative Brass Hinges", price: 19.99, image: "https://source.unsplash.com/400x300/?brass-hinge" }
+            ],
+            engine: [
+                { id: 301, name: "Fuel Injection System", price: 249.99, image: "https://source.unsplash.com/400x300/?fuel-injection" },
+                { id: 302, name: "Cylinder Head Assembly", price: 399.99, image: "https://source.unsplash.com/400x300/?cylinder-head" },
+                { id: 303, name: "Timing Belt Kit", price: 89.99, image: "https://source.unsplash.com/400x300/?timing-belt" },
+                { id: 304, name: "Engine Gasket Set", price: 49.99, image: "https://source.unsplash.com/400x300/?engine-gasket" }
+            ],
+            lumber: [
+                { id: 401, name: "Premium Hardwood Planks", price: 24.99, image: "https://source.unsplash.com/400x300/?hardwood" },
+                { id: 402, name: "Construction Grade Lumber", price: 18.99, image: "https://source.unsplash.com/400x300/?lumber" },
+                { id: 403, name: "Treated Plywood Sheets", price: 35.99, image: "https://source.unsplash.com/400x300/?plywood" },
+                { id: 404, name: "Cedar Fence Boards", price: 12.99, image: "https://source.unsplash.com/400x300/?cedar-fence" }
+            ],
+            // Default products for other subcategories
+            drawer: [
+                { id: 501, name: "Soft Close Drawer Slides", price: 22.99, image: "https://source.unsplash.com/400x300/?drawer-slides" },
+                { id: 502, name: "Drawer Organizer System", price: 29.99, image: "https://source.unsplash.com/400x300/?drawer-organizer" }
+            ],
+            accessories: [
+                { id: 601, name: "Furniture Leg Set", price: 32.99, image: "https://source.unsplash.com/400x300/?furniture-legs" },
+                { id: 602, name: "Cabinet Door Dampers", price: 8.99, image: "https://source.unsplash.com/400x300/?door-damper" }
+            ],
+            brake: [
+                { id: 701, name: "Brake Pad Set", price: 39.99, image: "https://source.unsplash.com/400x300/?brake-pad" },
+                { id: 702, name: "Disc Brake Rotors", price: 59.99, image: "https://source.unsplash.com/400x300/?brake-rotor" }
+            ],
+            electrical: [
+                { id: 801, name: "Car Battery", price: 89.99, image: "https://source.unsplash.com/400x300/?car-battery" },
+                { id: 802, name: "Alternator", price: 129.99, image: "https://source.unsplash.com/400x300/?alternator" }
+            ],
+            bodyparts: [
+                { id: 901, name: "Front Bumper", price: 199.99, image: "https://source.unsplash.com/400x300/?bumper" },
+                { id: 902, name: "Side Mirror", price: 79.99, image: "https://source.unsplash.com/400x300/?car-mirror" }
+            ],
+            concrete: [
+                { id: 1001, name: "Concrete Mix", price: 14.99, image: "https://source.unsplash.com/400x300/?concrete-mix" },
+                { id: 1002, name: "Concrete Blocks", price: 3.99, image: "https://source.unsplash.com/400x300/?concrete-block" }
+            ],
+            roofing: [
+                { id: 1101, name: "Asphalt Shingles", price: 29.99, image: "https://source.unsplash.com/400x300/?shingles" },
+                { id: 1102, name: "Metal Roofing Panels", price: 45.99, image: "https://source.unsplash.com/400x300/?metal-roofing" }
+            ],
+            plumbing: [
+                { id: 1201, name: "PVC Pipe Set", price: 12.99, image: "https://source.unsplash.com/400x300/?pvc-pipe" },
+                { id: 1202, name: "Bathroom Faucet", price: 59.99, image: "https://source.unsplash.com/400x300/?faucet" }
+            ]
+        };
+
+        let cart = [];
+        let currentCategory = null;
+        let currentSubcategory = null;
+
+        // DOM Elements
+        const authSection = document.getElementById('authSection');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const mainSection = document.getElementById('mainSection');
+        
+        // Navigation Elements
+        const categoriesSection = document.getElementById('categoriesSection');
+        const subCategoriesSection = document.getElementById('subCategoriesSection');
+        const productsSection = document.getElementById('productsSection');
+        
+        // Auth Buttons
+        const showRegisterBtn = document.getElementById('showRegisterBtn');
+        const showLoginBtn = document.getElementById('showLoginBtn');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const phoneLoginBtn = document.getElementById('phoneLoginBtn');
+        const emailLoginFields = document.getElementById('emailLoginFields');
+        const phoneLoginFields = document.getElementById('phoneLoginFields');
+        
+        // Registration Steps
+        const registerStep1 = document.getElementById('registerStep1');
+        const registerStep2 = document.getElementById('registerStep2');
+        const nextToStep2 = document.getElementById('nextToStep2');
+        const backToStep1 = document.getElementById('backToStep1');
+        
+        // Navigation Buttons
+        const backToCategories = document.getElementById('backToCategories');
+        const backToSubCategories = document.getElementById('backToSubCategories');
+        const subCategoryTitle = document.getElementById('subCategoryTitle');
+        const productsTitle = document.getElementById('productsTitle');
+        
+        // Cart Elements
+        const cartBtn = document.getElementById('cartBtn');
+        const cartModal = document.getElementById('cartModal');
+        const closeCart = document.getElementById('closeCart');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const cartCount = document.getElementById('cartCount');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        
+        // Checkout Elements
+        const checkoutModal = document.getElementById('checkoutModal');
+        const closeCheckout = document.getElementById('closeCheckout');
+        const checkoutItems = document.getElementById('checkoutItems');
+        const checkoutSubtotal = document.getElementById('checkoutSubtotal');
+        const checkoutTotal = document.getElementById('checkoutTotal');
+        const checkoutForm = document.getElementById('checkoutForm');
+        
+        // Tracking Elements
+        const trackingModal = document.getElementById('trackingModal');
+        const closeTracking = document.getElementById('closeTracking');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Auth Navigation
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+        });
+
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        // Login Methods Toggle
+        emailLoginBtn.addEventListener('click', () => {
+            emailLoginBtn.classList.add('border-blue-500', 'text-blue-600');
+            emailLoginBtn.classList.remove('border-transparent', 'text-gray-500');
+            phoneLoginBtn.classList.add('border-transparent', 'text-gray-500');
+            phoneLoginBtn.classList.remove('border-blue-500', 'text-blue-600');
+            emailLoginFields.classList.remove('hidden');
+            phoneLoginFields.classList.add('hidden');
+        });
+
+        phoneLoginBtn.addEventListener('click', () => {
+            phoneLoginBtn.classList.add('border-blue-500', 'text-blue-600');
+            phoneLoginBtn.classList.remove('border-transparent', 'text-gray-500');
+            emailLoginBtn.classList.add('border-transparent', 'text-gray-500');
+            emailLoginBtn.classList.remove('border-blue-500', 'text-blue-600');
+            phoneLoginFields.classList.remove('hidden');
+            emailLoginFields.classList.add('hidden');
+        });
+
+        // Registration Steps
+        nextToStep2.addEventListener('click', () => {
+            const businessName = document.getElementById('businessName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!businessName || !email || !phone || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            registerStep1.classList.add('hidden');
+            registerStep2.classList.remove('hidden');
+        });
+
+        backToStep1.addEventListener('click', () => {
+            registerStep2.classList.add('hidden');
+            registerStep1.classList.remove('hidden');
+        });
+
+        // Auth Form Submissions
+        loginSubmitBtn.parentElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            let email, password;
+            
+            if (!emailLoginFields.classList.contains('hidden')) {
+                email = document.getElementById('loginEmail').value;
+                password = document.getElementById('loginPassword').value;
+                
+                if (!email || !password) {
+                    alert('Please enter both email and password');
+                    return;
+                }
+            } else {
+                const phone = document.getElementById('loginPhone').value;
+                password = document.getElementById('loginPasswordPhone').value;
+                
+                if (!phone || !password) {
+                    alert('Please enter both phone number and password');
+                    return;
+                }
+            }
+            
+            authSection.classList.add('hidden');
+            mainSection.classList.remove('hidden');
+            initializeApp();
+        });
+
+        registerSubmitBtn.parentElement.parentElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const businessType = document.getElementById('businessType').value;
+            const industry = document.getElementById('industry').value;
+            const address = document.getElementById('businessAddress').value;
+            
+            if (!businessType || !industry || !address) {
+                alert('Please complete your business profile');
+                return;
+            }
+            
+            authSection.classList.add('hidden');
+            mainSection.classList.remove('hidden');
+            initializeApp();
+        });
+
+        // App Navigation
+        backToCategories.addEventListener('click', () => {
+            subCategoriesSection.classList.add('hidden');
+            categoriesSection.classList.remove('hidden');
+            currentCategory = null;
+        });
+
+        backToSubCategories.addEventListener('click', () => {
+            productsSection.classList.add('hidden');
+            subCategoriesSection.classList.remove('hidden');
+            currentSubcategory = null;
+        });
+
+        // Cart Toggle
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('hidden');
+            renderCartItems();
+        });
+        closeCart.addEventListener('click', () => cartModal.classList.add('hidden'));
+
+        // Checkout Toggle
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length > 0) {
+                cartModal.classList.add('hidden');
+                checkoutModal.classList.remove('hidden');
+                renderCheckout();
+            } else {
+                alert('Your cart is empty');
+            }
+        });
+        closeCheckout.addEventListener('click', () => checkoutModal.classList.add('hidden'));
+
+        // Tracking Modal Toggle
+        closeTracking.addEventListener('click', () => trackingModal.classList.add('hidden'));
+
+        // Logout Handler
+        logoutBtn.addEventListener('click', () => {
+            authSection.classList.remove('hidden');
+            mainSection.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            cart = [];
+            updateCartCount();
+            currentCategory = null;
+            currentSubcategory = null;
+        });
+
+        // Checkout Form Submission
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validate payment method
+            const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+            let paymentSelected = false;
+            
+            for (let radio of paymentMethods) {
+                if (radio.checked) {
+                    paymentSelected = true;
+                    break;
+                }
+            }
+            
+            if (!paymentSelected) {
+                alert('Please select a payment method');
+                return;
+            }
+            
+            // Process order
+            cart = [];
+            updateCartCount();
+            checkoutModal.classList.add('hidden');
+            trackingModal.classList.remove('hidden');
+        });
+
+        // Initialize Categories
+        function initializeApp() {
+            // Add event listeners to category cards
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const categoryId = card.getAttribute('data-category');
+                    showSubcategories(categoryId);
+                });
+            });
+        }
+
+        // Show subcategories for a selected category
+        function showSubcategories(categoryId) {
+            currentCategory = categoryId;
+            const category = categories[categoryId];
+            
+            // Update title
+            subCategoryTitle.textContent = category.name + " Subcategories";
+            
+            // Render subcategories
+            const subCategoriesGrid = document.getElementById('subCategoriesGrid');
+            subCategoriesGrid.innerHTML = category.subcategories.map(subcategory => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow subcategory-card" data-subcategory="${subcategory.id}">
+                    <img src="${subcategory.image}" alt="${subcategory.name}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium">${subcategory.name}</h3>
+                        <p class="text-gray-600 mt-1">Quality products for your business</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to subcategory cards
+            subCategoriesGrid.querySelectorAll('.subcategory-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const subcategoryId = card.getAttribute('data-subcategory');
+                    showProducts(subcategoryId);
+                });
+            });
+            
+            // Show subcategories section
+            categoriesSection.classList.add('hidden');
+            subCategoriesSection.classList.remove('hidden');
+        }
+
+        // Show products for a selected subcategory
+        function showProducts(subcategoryId) {
+            currentSubcategory = subcategoryId;
+            const subcategoryName = categories[currentCategory].subcategories.find(s => s.id === subcategoryId).name;
+            
+            // Update title
+            productsTitle.textContent = subcategoryName;
+            
+            // Get products for this subcategory
+            const subcategoryProducts = products[subcategoryId] || [];
+            
+            // Render products
+            const productsGrid = document.getElementById('productsGrid');
+            if (subcategoryProducts.length === 0) {
+                productsGrid.innerHTML = `<div class="col-span-full text-center py-8">No products available in this category yet.</div>`;
+            } else {
+                productsGrid.innerHTML = subcategoryProducts.map(product => `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold">${product.name}</h3>
+                            <p class="text-gray-600 mt-1">$${product.price.toFixed(2)}</p>
+                            <button onclick="addToCart(${product.id}, '${subcategoryId}')" class="mt-3 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Show products section
+            subCategoriesSection.classList.add('hidden');
+            productsSection.classList.remove('hidden');
+        }
+
+        // Add to Cart
+        function addToCart(productId, subcategoryId) {
+            const subcategoryProducts = products[subcategoryId] || [];
+            const product = subcategoryProducts.find(p => p.id === productId);
+            
+            if (!product) return;
+            
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartCount();
+        }
+
+        // Update Cart Count
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = count;
+        }
+
+        // Render Cart Items
+        function renderCartItems() {
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="text-center py-8 text-gray-500">Your cart is empty</div>';
+                cartTotal.textContent = '$0.00';
+                return;
+            }
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between border-b pb-4">
+                    <div class="flex items-center">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded">
+                        <div class="ml-4">
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-gray-600">$${item.price.toFixed(2)}</p>
+                            <div class="flex items-center mt-1">
+                                <button onclick="updateCartItemQuantity(${item.id}, ${item.quantity - 1})" class="text-gray-500 hover:text-gray-700">
+                                    <i class="bi bi-dash-circle"></i>
+                                </button>
+                                <span class="mx-2">${item.quantity}</span>
+                                <button onclick="updateCartItemQuantity(${item.id}, ${item.quantity + 1})" class="text-gray-500 hover:text-gray-700">
+                                    <i class="bi bi-plus-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            // Calculate total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Update Cart Item Quantity
+        function updateCartItemQuantity(productId, newQuantity) {
+            if (newQuantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+            
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity = newQuantity;
+                renderCartItems();
+                updateCartCount();
+            }
+        }
+
+        // Remove from Cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderCartItems();
+            updateCartCount();
+        }
+
+        // Render Checkout Items
+        function renderCheckout() {
+            checkoutItems.innerHTML = cart.map(item => `
+                <div class="flex justify-between">
+                    <span>${item.name} x ${item.quantity}</span>
+                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+            
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            checkoutSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            
+            const total = subtotal + 10; // Adding $10 for shipping
+            checkoutTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Expose the functions to global scope for onclick handlers
+        window.addToCart = addToCart;
+        window.removeFromCart = removeFromCart;
+        window.updateCartItemQuantity = updateCartItemQuantity;
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
